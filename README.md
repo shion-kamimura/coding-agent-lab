@@ -9,18 +9,19 @@ Pythonパッケージと開発環境を初期化した段階です。
 
 ## 開発環境の準備
 
-Python 3.12以上を使用します。CIでは3.12、3.13、3.14を検証します。
+Python 3.15の最新パッチ版を開発に使用します。最低対応バージョンは3.15で、
+CIも3.15を検証します。Python 3.14以前はサポート対象外です。
 
 ```bash
 git clone https://github.com/shion-kamimura/coding-agent-lab.git
 cd coding-agent-lab
-python3.12 -m venv .venv
+python3.15 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
 python -m pip install -e '.[dev]'
 ```
 
-Windowsでは、インストールした対応版のPythonで `py -3.12 -m venv .venv` を実行し、
+Windowsでは、インストールした対応版のPythonで `py -3.15 -m venv .venv` を実行し、
 PowerShellで `.venv\Scripts\Activate.ps1` を使って有効化してください。
 
 ## 品質チェック
