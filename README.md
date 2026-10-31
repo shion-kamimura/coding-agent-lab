@@ -35,7 +35,9 @@ python -m pytest
 
 自動整形は `python -m ruff format .`、修正可能なlintの適用は
 `python -m ruff check --fix .` で行えます。変更内容を確認してコミットしてください。
-GitHub Actionsでも同じチェックを行い、wheelを作成してインストール後に再テストします。
+GitHub ActionsではLint・Format・Typecheck・Tests・Wheelを独立したジョブで実行します。
+Wheelではwheelを作成し、editable installを置き換えて再テストします。
+CI成功をマージ条件にするには、別途 [ルールセットの設定](docs/ci.md) が必要です。
 
 ## 構成
 
