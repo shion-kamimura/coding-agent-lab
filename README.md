@@ -9,7 +9,8 @@ Claude Messages APIによる同期テキスト生成Clientを実装済みです�
 
 ## ドキュメント
 
-- [開発を始める](docs/development.md)：環境構築、品質チェック、開発の進め方
+- [開発を始める](docs/development.md)：環境構築、検証、PR・結果報告、中断再開
+- [AIの作業入口](AGENTS.md)：目的、関連資料、共通の作業境界
 - [LLM Clientを使う](docs/llm-client.md)：APIの利用例、設定、使用量、エラー
 - [設計と実装順序を知る](docs/architecture.md)：構成、責務、今後の実装範囲
 - [技術選定の理由を読む](docs/adr/)：設計判断とその背景
