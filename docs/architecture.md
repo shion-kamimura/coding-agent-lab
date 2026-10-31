@@ -7,6 +7,18 @@ Agent EngineeringとLLMOpsを学ぶため、単一のCoding Agentを段階的に
 既定はHaikuで、同じ呼び出し側から設定でSonnetへ手動で切り替えられます。
 CLI、Agent Loop、ファイル操作、コマンド実行は今後の設計案です。
 
+## 構成
+
+```text
+src/coding_agent/       LLM Clientの型とAnthropic実装
+tests/                 インストール・LLM Clientのオフライン検証
+docs/architecture.md   今後のアーキテクチャと実装順序
+docs/adr/              技術選定と理由
+experiments/           今後の比較実験
+.github/               CI・Issue・PRテンプレート
+pyproject.toml         パッケージ・開発依存・品質チェック設定
+```
+
 ## 最初の到達点
 
 自然言語の指示をCLIで受け取り、作業ディレクトリのファイルを調査・修正し、
@@ -57,6 +69,8 @@ Haikuの性能が将来の全作業に十分とは判断していません。Age
 - ログにはAPIキーや機密ファイルの内容を残さない。
 
 ## 段階的な実装順序
+
+初期はAgent Frameworkを使わず、LLM Client、File Tools、Agent Loop、CLIの順で進めます。
 
 1. 開発環境の初期化（実装済み）
 2. LLM Client：プロバイダー選定、型、エラーと再試行方針（同期テキスト生成を実装済み）
