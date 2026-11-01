@@ -1,8 +1,11 @@
 # ADR 0002: Haikuから始めるLLM Client
 
-- 状態: 採用（設計確認済み。実装はレビュー対象）
+- 状態: 一部置換（2026-11-01、独自Client・型・例外変換は [ADR 0003](0003-sdk-first-learning.md) で廃止）
 - 日付: 2026-10-31
 - 対応: [Issue #5](https://github.com/shion-kamimura/coding-agent-lab/issues/5)
+
+以下はPR #6で採用した当時の判断です。現在の利用方法は
+[公式SDKの利用ガイド](../llm-client.md)、学習・実装方針はADR 0003を参照してください。
 
 ## 目的と今回の範囲
 
