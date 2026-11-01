@@ -5,6 +5,9 @@
 
 ## 前提
 
+以下の初期方針のうち、自作を学習の前提とする部分は2026-11-01の
+[ADR 0003](0003-sdk-first-learning.md) で見直しました。Python・開発基盤の選定は維持します。
+
 Python、CLI、pytest、GitHub Actionsを使い、初期はAgent Frameworkを使わずに
 Agent Loopの内部構造を学ぶ方針を引き継ぎます。既存のMITライセンスを維持します。
 

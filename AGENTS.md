@@ -2,9 +2,10 @@
 
 ## 目的と現在地
 
-Agent EngineeringとLLMOpsを学ぶため、Coding Agentをゼロから作るプロジェクトです。
-現在は開発環境とClaude Messages APIによる同期テキスト生成のLLM Clientを実装済みです。
-File Tools、Agent Loop、CLIを順に実装し、初期はAgent Frameworkを使いません。
+Agent EngineeringとLLMOpsを学ぶため、公式SDKを使ってCoding Agentを段階的に作ります。
+現在は開発環境と、Anthropic公式Python SDKを直接使う同期テキスト生成の実行例があります。
+独自のClient・共通型・例外変換層は設けず、公式教材に沿ってTool CallingとAgent Loopへ
+進みます。Tool RunnerやAgent SDKを利用する範囲は課題ごとに判断します。
 
 この文書は開発を支援するAIの作業ルールです。開発対象のCoding Agent本体の
 権限・ツール実行・承認方針を定めるものではありません。
@@ -18,7 +19,7 @@ File Tools、Agent Loop、CLIを順に実装し、初期はAgent Frameworkを使
 - 仕様・構成を調べるときは [アーキテクチャ](docs/architecture.md)、
   技術選定の理由は [ADR](docs/adr/)、環境設定は [pyproject.toml](pyproject.toml) と
   [CI](.github/workflows/ci.yml) を参照する。全資料の常時読込は不要。
-  LLM Clientの使い方は [利用ガイド](docs/llm-client.md)、CIとマージ条件は
+  公式SDKの実行例は [利用ガイド](docs/llm-client.md)、CIとマージ条件は
   [CIの設定資料](docs/ci.md) に置く。
 
 ## 学習を支援する進め方
@@ -26,9 +27,12 @@ File Tools、Agent Loop、CLIを順に実装し、初期はAgent Frameworkを使
 - 到達目標は、ユーザーが実装の目的・処理の流れ・責任の分担・設計理由・検証と限界を
   自分の言葉で説明できること。コードの逐行解説だけで理解済みと判断しない。
 - 機能の設計・実装や理解の支援では [学習の進め方](docs/learning.md) を参照し、
-  関連資料の確認、実装前の説明、小さな実装と検証、説明の更新を一単位にする。
-- 理解を確かめる問いを絞って提示する。ユーザーの回答なしに理解済みと記録せず、
-  理解確認への回答を、許可済みの作業を進めるための一律の必須条件にしない。
+  「公式資料を読む → それに沿って実装する」の二段階を基本にする。
+  教材の該当箇所と実装の対応、教材からの変更点、動作確認と限界を示す。
+- 質問による理解確認や説明の提出を標準手順にしない。補足・質問・理解確認は
+  ユーザーが希望した場合に行い、回答や検証のない理解・学習効果を推測で記録しない。
+- SDKの公開API・型・例外を優先する。独自の抽象化や機能の再実装は、具体的な要件と
+  維持する理由がある場合に限る。自作する量を学習の深さの基準にしない。
 
 ## 共通の境界
 
