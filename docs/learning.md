@@ -103,7 +103,8 @@ Platform 101はPython中心ですが、最初のAPI呼出しなど一部にTypeS
 実行例があります。#14の教材・実装の対応と検証の限界は [利用ガイド](llm-client.md#addツールを1回実行する14)
 にあります。上限付きAgent LoopとTool Runnerのオフライン比較も追加済みで、
 [ループの教材対応・責務・限界](llm-client.md#小さなagent-loop) と
-[比較結果](../experiments/tool-runner.md) を参照できます。File Toolsと製品CLIは未実装です。#6の振り返りは最初の教材を読み、
+[比較結果](../experiments/tool-runner.md) を参照できます。読み取り専用File Toolsも実装済みで、[教材対応と検証の限界](file-research.md) を参照できます。
+編集・コマンド実行・製品CLIは未実装です。#6の振り返りは最初の教材を読み、
 公式SDKの要求・応答・終了理由を [実行例と利用ガイド](llm-client.md) に対応づけます。
 方針変更は [ADR 0003](adr/0003-sdk-first-learning.md)、実装順序は
 [アーキテクチャ](architecture.md) にあります。
