@@ -99,8 +99,9 @@ Platform 101はPython中心ですが、最初のAPI呼出しなど一部にTypeS
 
 ## 現在地と記録先
 
-2026-11-01時点で、公式Client SDKを直接使う同期テキスト生成の実行例があります。
-Tool Calling、File Tools、Agent Loop、製品CLIは未実装です。#6の振り返りは最初の教材を読み、
+2026-11-10時点で、公式Client SDKを直接使う同期テキスト生成と、加算ツール1往復の
+実行例があります。#14の教材・実装の対応と検証の限界は [利用ガイド](llm-client.md#addツールを1回実行する14)
+にあります。File Tools、Agent Loop、製品CLIは未実装です。#6の振り返りは最初の教材を読み、
 公式SDKの要求・応答・終了理由を [実行例と利用ガイド](llm-client.md) に対応づけます。
 方針変更は [ADR 0003](adr/0003-sdk-first-learning.md)、実装順序は
 [アーキテクチャ](architecture.md) にあります。

@@ -3,8 +3,8 @@
 ## 目的と現在地
 
 Agent EngineeringとLLMOpsを学ぶため、公式SDKを使ってCoding Agentを段階的に作ります。
-現在は開発環境と、Anthropic公式Python SDKを直接使う同期テキスト生成の実行例があります。
-独自のClient・共通型・例外変換層は設けず、公式教材に沿ってTool CallingとAgent Loopへ
+現在は開発環境と、Anthropic公式Python SDKを直接使う同期テキスト生成・加算ツール1往復の実行例があります。
+独自のClient・共通型・例外変換層は設けず、公式教材に沿ってAgent Loopへ
 進みます。Tool RunnerやAgent SDKを利用する範囲は課題ごとに判断します。
 
 この文書は開発を支援するAIの作業ルールです。開発対象のCoding Agent本体の
