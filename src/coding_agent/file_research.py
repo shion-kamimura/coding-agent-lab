@@ -5,7 +5,12 @@ import os
 from pathlib import Path
 
 import anthropic
-from anthropic.types import MessageParam, ToolParam
+from anthropic.types import (
+    MessageParam,
+    ToolChoiceAnyParam,
+    ToolChoiceAutoParam,
+    ToolParam,
+)
 
 from coding_agent.file_tools import FileTools
 
@@ -46,8 +51,33 @@ Final response must be JSON only, with exactly these keys:
 "limitations": "what remains unverified; say so when evidence is unavailable"}.
 Each finding must cite a nonblank line you actually read. Include prerequisites
 and test commands when asked. An empty findings list means incomplete research.
+Copy each quote from the decoded text field and its matching line number.
+Do not copy JSON escape sequences as literal characters or infer line numbers.
 Do not claim that commands were executed or that answering proves correctness.
 """
+
+ANSWER_SCHEMA: dict[str, object] = {
+    "type": "object",
+    "properties": {
+        "findings": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "path": {"type": "string"},
+                    "line": {"type": "integer"},
+                    "quote": {"type": "string"},
+                    "explanation": {"type": "string"},
+                },
+                "required": ["path", "line", "quote", "explanation"],
+                "additionalProperties": False,
+            },
+        },
+        "limitations": {"type": "string"},
+    },
+    "required": ["findings", "limitations"],
+    "additionalProperties": False,
+}
 
 
 def checked_answer(text: str, files: FileTools) -> str:
@@ -109,14 +139,22 @@ def research(
             anthropic.Anthropic(timeout=30.0, max_retries=0) as client,
         ):
             for _ in range(max_steps):
+                choice: ToolChoiceAutoParam | ToolChoiceAnyParam = (
+                    {"type": "auto", "disable_parallel_tool_use": True}
+                    if files.evidence
+                    else {"type": "any", "disable_parallel_tool_use": True}
+                )
                 response = client.messages.create(
                     model=model,
                     max_tokens=4096,
                     thinking={"type": "disabled"},
                     system=SYSTEM,
+                    output_config={
+                        "format": {"type": "json_schema", "schema": ANSWER_SCHEMA}
+                    },
                     messages=messages,
                     tools=TOOLS,
-                    tool_choice={"type": "auto", "disable_parallel_tool_use": True},
+                    tool_choice=choice,
                     stream=False,
                 )
                 calls = [
@@ -137,7 +175,7 @@ def research(
                             {
                                 "type": "tool_result",
                                 "tool_use_id": call.id,
-                                "content": json.dumps(result, ensure_ascii=True),
+                                "content": json.dumps(result, ensure_ascii=False),
                                 "is_error": "error" in result,
                             }
                         ],
