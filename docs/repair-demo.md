@@ -1,4 +1,32 @@
-# 修正とテスト実行の最小例（#21）
+# 修正とテスト実行の最小例（#21・#23）
+
+## 同じ課題をClient SDKで実行する（#23）
+
+ループ・履歴・停止の学習はClient SDKを主軸とし、Agent SDK版を比較用に維持します。
+理由は [ADR 0006](adr/0006-client-sdk-primary.md)、実測値は
+[同一課題の比較](../experiments/repair-sdk-comparison.md) を参照してください。
+
+```bash
+python -m coding_agent.client_repair
+python -m coding_agent.repair_demo
+```
+
+両方式は`repair_exercise.py`で課題・操作範囲・固定テスト・成功判定を共有します。
+Client版は`Read`（全体読取）、`Edit`（一意な部分置換）、`run_tests`の3操作を
+公式`ToolParam`で定義し、`messages.create()`の応答を調べて実行します。
+assistant応答全体と同じtool_use_idの結果を履歴へ追加する構造は、公式Client SDKの
+[tools.py](https://github.com/anthropics/anthropic-sdk-python/blob/main/examples/tools.py)
+と同じです。2026-11-11に本文を再確認しました。
+教材からの追加は手動反復・操作境界・固定テスト・実結果による完了確認です。
+
+テストが失敗しても終了コードと出力を返し、上限内で再修正できます。
+終了時には最終ソースと同じ内容でモデルがテストを実行済みであることを確認し、
+アプリでもう一度テストします。最終本文の「成功」だけでは受け入れません。
+Client版の`max_steps`は1〜20、既定12。最終回答もAPI要求1回として数えます。
+要求ごとに4096出力トークン、timeout 30秒、再試行0で、全体の実時間・費用の上限ではありません。
+拒否は固定のエラー結果で返し、SDK通信と想定外の操作内部エラーは停止します。
+テスト実行の例外はAgent版と同様に固定文言の結果へ変換します。
+以下の操作境界と実行範囲は両方式で維持しています。SDK固有の設定は各版で異なります。
 
 ## 目的と呼び出し方
 

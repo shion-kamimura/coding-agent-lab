@@ -7,6 +7,7 @@ Agent EngineeringとLLMOpsを学ぶため、公式教材を読み、公式SDKで
 同期テキスト生成の実行例があります。既定はHaikuで、環境変数でSonnetへ切り替えられます。
 加算ツール1往復と上限付きAgent Loop、読み取り専用のファイル調査も実装済みです。
 Agent SDKで一時的な算術課題を編集し、固定テストを確認する最小例を追加しました。
+同じ課題をClient SDKでも実装し、ループ学習の主軸にしています。Agent SDK版は比較用です。
 汎用の編集・コマンド実行、製品CLIは未実装です。
 
 ## 現在の構成
@@ -18,6 +19,8 @@ src/coding_agent/agent_loop.py  単一addを逐次実行する上限付きルー
 src/coding_agent/file_tools.py  許可ファイルの一覧・範囲読み取りと操作境界
 src/coding_agent/file_research.py  調査ループと読取履歴による引用照合
 src/coding_agent/repair_demo.py  Agent SDKによる一時課題の編集と固定テスト
+src/coding_agent/client_repair.py  同じ修正課題を扱うClient SDK手動ループ
+src/coding_agent/repair_exercise.py  両方式で共有する課題・操作境界・成功判定
 tests/                   実行例とインストールのオフライン検証
 docs/learning.md         公式教材・実装を対応づける学習順序
 docs/adr/                技術選定と理由
@@ -70,6 +73,8 @@ SDKのMessage・Usage・例外を共通型へ変換するClientやProtocolは設
 例外本文を出さず即停止する方針との差から既存例の置換は行いません。
 Agent SDKの限定導入は [ADR 0005](adr/0005-repair-demo-agent-sdk.md)、教材との対応と
 操作境界は [修正とテスト実行の最小例](repair-demo.md) にあります。
+主軸と比較用を分ける学習方針は [ADR 0006](adr/0006-client-sdk-primary.md)、
+同じ課題での結果と比較の限界は [実験記録](../experiments/repair-sdk-comparison.md) にあります。
 学習用の短い手動ループからTool Runnerへ置き換える教材に沿って進め、独自の承認・
 条件付き実行などの要件があれば対応範囲を確認します。コーディング機能の組み込みが
 必要な段階ではAgent SDKも比較します。全面的な自作やSDK移行を先に固定しません。
@@ -87,7 +92,7 @@ Agent SDKの限定導入は [ADR 0005](adr/0005-repair-demo-agent-sdk.md)、教�
 
 1. 開発環境（実装済み）と公式SDKの同期テキスト生成例（実装済み）を教材に対応づける。
 2. 単一ツールの往復・短いAgent Loop・Tool Runnerのオフライン比較（実装済み）を教材と照合する。
-3. 読取専用調査と、Agent SDKによる限定した算術課題の修正・固定テスト（実装済み）を踏まえ、汎用コードを扱う操作境界を決める。
+3. 読取専用調査と、両SDKによる同じ算術課題の修正・固定テスト（実装済み）を踏まえ、Client SDKで制御点を学び、汎用コードを扱う操作境界を決める。
 4. アプリ・CLIへ統合し、オフラインE2Eと必要な実API検証を分ける。
 5. 評価セット、トレース、モデル・設定の品質・費用・時間の比較を行う。
 

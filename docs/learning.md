@@ -106,6 +106,9 @@ Platform 101はPython中心ですが、最初のAPI呼出しなど一部にTypeS
 [ループの教材対応・責務・限界](llm-client.md#小さなagent-loop) と
 [比較結果](../experiments/tool-runner.md) を参照できます。読み取り専用File Toolsも実装済みで、[教材対応と検証の限界](file-research.md) を参照できます。
 Agent SDKによる [修正と固定テストの最小例](repair-demo.md) も追加しました。
+同じ課題のClient SDK手動ループを主軸に、失敗からの再修正・履歴・停止を学びます。
+Agent SDK版は比較用に維持し、[同一課題の比較](../experiments/repair-sdk-comparison.md) で
+委任する処理と自分で制御する処理を確認します。方針は [ADR 0006](adr/0006-client-sdk-primary.md) にあります。
 汎用の編集・コマンド実行・製品CLIは未実装です。#6の振り返りは最初の教材を読み、
 公式SDKの要求・応答・終了理由を [実行例と利用ガイド](llm-client.md) に対応づけます。
 方針変更は [ADR 0003](adr/0003-sdk-first-learning.md)、実装順序は
