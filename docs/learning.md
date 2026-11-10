@@ -49,7 +49,8 @@ AIが曖昧な要求から補った重要な仕様・前提が見えなくなる
 - Agent Loopは公式例の小さな実装で仕組みを確認し、Tool Runnerへ置き換える教材を使えます。
   自作ループの継続を前提にせず、必要な制御とTool Runnerの対応範囲を照合します。
 - コーディングエージェントの組み込み機能が必要ならClaude Agent SDKも比較します。
-  現在採用しているClient SDKとAgent SDKは別の製品で、Agent SDKへの移行は未実施です。
+  Client SDKとAgent SDKは別の製品です。新しい修正課題にAgent SDKを導入していますが、
+  既存のClient SDKによる実行例は置き換えていません。
 - SDKの信頼性と、変更の影響がないことは同義ではありません。バージョン範囲、公開仕様、
   Betaの状態を確認し、プロジェクト側の動作を検証します。
 
@@ -104,7 +105,8 @@ Platform 101はPython中心ですが、最初のAPI呼出しなど一部にTypeS
 にあります。上限付きAgent LoopとTool Runnerのオフライン比較も追加済みで、
 [ループの教材対応・責務・限界](llm-client.md#小さなagent-loop) と
 [比較結果](../experiments/tool-runner.md) を参照できます。読み取り専用File Toolsも実装済みで、[教材対応と検証の限界](file-research.md) を参照できます。
-編集・コマンド実行・製品CLIは未実装です。#6の振り返りは最初の教材を読み、
+Agent SDKによる [修正と固定テストの最小例](repair-demo.md) も追加しました。
+汎用の編集・コマンド実行・製品CLIは未実装です。#6の振り返りは最初の教材を読み、
 公式SDKの要求・応答・終了理由を [実行例と利用ガイド](llm-client.md) に対応づけます。
 方針変更は [ADR 0003](adr/0003-sdk-first-learning.md)、実装順序は
 [アーキテクチャ](architecture.md) にあります。
