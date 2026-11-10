@@ -4,6 +4,7 @@
 
 Agent EngineeringとLLMOpsを学ぶため、公式SDKを使ってCoding Agentを段階的に作ります。
 現在は開発環境と、Anthropic公式Python SDKを直接使う同期テキスト生成・加算ツール1往復・上限付きAgent Loop・読み取り専用ファイル調査の実行例があります。
+Agent SDKで一時的な算術課題を修正し、固定テストを確認する最小例もあります。
 独自のClient・共通型・例外変換層は設けず、公式教材に沿って段階的に
 進みます。Tool RunnerやAgent SDKを利用する範囲は課題ごとに判断します。
 

@@ -5,7 +5,7 @@ Agent EngineeringとLLMOpsを学び、公式SDKで段階的に開発するコー
 ## 現在の状態
 
 Anthropic公式Python SDKを直接使う同期テキスト生成、加算ツール1往復、上限付きAgent Loop、読み取り専用のファイル調査の実行例があります。
-既定のHaikuから環境変数でSonnetへ手動で切り替えられます。エージェント本体とCLIは今後実装します。
+既定のHaikuから環境変数でSonnetへ手動で切り替えられます。Agent SDKで一時的な算術課題を修正し、固定テストを確認する最小例もあります。汎用のエージェント本体とCLIは今後実装します。
 
 ## ドキュメント
 
@@ -13,6 +13,7 @@ Anthropic公式Python SDKを直接使う同期テキスト生成、加算ツー�
 - [AIの作業入口](AGENTS.md)：目的、関連資料、共通の作業境界
 - [学習の進め方](docs/learning.md)：公式資料を読む・実装する二段階の進め方、教材と学習順序
 - [公式SDKでテキスト生成する](docs/llm-client.md)：実行方法、SDKの利用例、設定、使用量、エラー
+- [修正とテスト実行の最小例](docs/repair-demo.md)：Agent SDKによる限定した課題の編集・テスト・完了判定
 - [ファイルを調査する](docs/file-research.md)：許可範囲、引用照合、上限、SDK選定、検証の限界
 - [設計と実装順序を知る](docs/architecture.md)：構成、責務、今後の実装範囲
 - [技術選定の理由を読む](docs/adr/)：設計判断とその背景
