@@ -1,6 +1,7 @@
 """実モデルなしで操作境界・固定テスト・完了判定を確認する。"""
 
 import asyncio
+import json
 import subprocess
 import sys
 from collections.abc import AsyncIterator
@@ -245,8 +246,14 @@ def test_sdk_wiring_and_test_tool(monkeypatch: pytest.MonkeyPatch) -> None:
             assert "加算" in prompt
 
         async def receive_response(self) -> AsyncIterator[ResultMessage]:
-            (self.root / "calculator.py").write_text(FIXED)
+            (self.root / "calculator.py").write_text(
+                "def add(a, b):\n    return a * b\n"
+            )
             assert (await captured[0].handler({"command": "bad"}))["is_error"]
+            failed = await captured[0].handler({})
+            assert "is_error" not in failed
+            assert json.loads(failed["content"][0]["text"])["returncode"] != 0
+            (self.root / "calculator.py").write_text(FIXED)
 
             def fail_test(self: demo.Exercise) -> dict[str, object]:
                 raise RuntimeError("private-secret")
@@ -256,7 +263,7 @@ def test_sdk_wiring_and_test_tool(monkeypatch: pytest.MonkeyPatch) -> None:
                 failure = await captured[0].handler({})
                 assert failure["is_error"]
                 assert "private" not in str(failure)
-            for _ in range(3):
+            for _ in range(2):
                 output = await captured[0].handler({})
                 assert "is_error" not in output
                 assert '"returncode": 0' in output["content"][0]["text"]
