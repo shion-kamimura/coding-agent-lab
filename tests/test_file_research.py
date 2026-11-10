@@ -65,6 +65,15 @@ def test_research_and_recovery(repo: Path, mock_sdk: MockSDK) -> None:
     def handler(request: httpx2.Request) -> httpx2.Response:
         nonlocal count
         payload = json.loads(request.content)
+        output_format = payload["output_config"]["format"]
+        assert output_format["type"] == "json_schema"
+        schema = output_format["schema"]
+        assert schema["required"] == ["findings", "limitations"]
+        assert schema["additionalProperties"] is False
+        finding = schema["properties"]["findings"]["items"]
+        assert finding["required"] == ["path", "line", "quote", "explanation"]
+        assert finding["additionalProperties"] is False
+        assert payload["tool_choice"]["type"] == ("auto" if count >= 3 else "any")
         assert payload["tool_choice"]["disable_parallel_tool_use"] is True
         assert len(payload["messages"]) == 1 + count * 2
         if count:
@@ -91,6 +100,39 @@ def test_research_and_recovery(repo: Path, mock_sdk: MockSDK) -> None:
     for text in ["docs/dev.md:1", "docs/dev.md:3", "python -m pytest", "Python 3.15"]:
         assert text in answer
     assert "要確認" in answer
+
+
+def test_japanese_evidence_is_returned_without_unicode_escapes(
+    repo: Path, mock_sdk: MockSDK
+) -> None:
+    quote = "通常テストはAPIキー不要です。"
+    (repo / "README.md").write_text(quote + "\n", encoding="utf-8")
+
+    def handler(request: httpx2.Request) -> httpx2.Response:
+        payload = json.loads(request.content)
+        if len(payload["messages"]) == 1:
+            return httpx2.Response(
+                200,
+                json=body(
+                    [call({"path": "README.md", "start_line": 1, "line_count": 1})],
+                    "tool_use",
+                ),
+            )
+        result = payload["messages"][-1]["content"][0]["content"]
+        assert quote in result
+        answer = {
+            "findings": [
+                {"path": "README.md", "line": 1, "quote": quote, "explanation": "前提"}
+            ],
+            "limitations": "未実行",
+        }
+        return httpx2.Response(
+            200,
+            json=body([{"type": "text", "text": json.dumps(answer)}], "end_turn"),
+        )
+
+    mock_sdk(handler)
+    assert quote in research("テストの前提は？", root=repo, allowed_files=ALLOWED)
 
 
 @pytest.mark.parametrize(
@@ -247,7 +289,9 @@ def test_failure_is_private(
     assert "private" not in captured.out + captured.err + str(error.value)
 
 
-@pytest.mark.parametrize("change", ["unread", "line", "quote", "empty", "invalid"])
+@pytest.mark.parametrize(
+    "change", ["unread", "line", "quote", "empty", "invalid", "wrapped"]
+)
 def test_unverified_answer_is_not_accepted(repo: Path, change: str) -> None:
     with FileTools(repo, ALLOWED) as tools:
         if change != "unread":
@@ -259,10 +303,11 @@ def test_unverified_answer_is_not_accepted(repo: Path, change: str) -> None:
             answer["findings"][0]["quote"] = "Python 9 required"
         elif change == "empty":
             answer["findings"] = []
+        text = "not JSON" if change == "invalid" else json.dumps(answer)
+        if change == "wrapped":
+            text = f"Here are the findings.\n```json\n{text}\n```\nSummary follows."
         with pytest.raises(SystemExit, match="Research incomplete"):
-            checked_answer(
-                "not JSON" if change == "invalid" else json.dumps(answer), tools
-            )
+            checked_answer(text, tools)
 
 
 @pytest.mark.parametrize(
