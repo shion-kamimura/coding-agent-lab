@@ -4,7 +4,7 @@ Agent EngineeringとLLMOpsを学び、公式SDKで段階的に開発するコー
 
 ## 現在の状態
 
-Anthropic公式Python SDKを直接使う同期テキスト生成と、加算ツールを1往復する実行例があります。
+Anthropic公式Python SDKを直接使う同期テキスト生成、加算ツール1往復、上限付きAgent Loopの実行例があります。
 既定のHaikuから環境変数でSonnetへ手動で切り替えられます。エージェント本体とCLIは今後実装します。
 
 ## ドキュメント

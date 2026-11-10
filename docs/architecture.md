@@ -5,17 +5,18 @@
 Agent EngineeringとLLMOpsを学ぶため、公式教材を読み、公式SDKでCoding Agentを
 段階的に実装します。開発環境と、Anthropic公式Python SDKのMessages APIを直接使う
 同期テキスト生成の実行例があります。既定はHaikuで、環境変数でSonnetへ切り替えられます。
-加算ツールの1往復も実装済みです。ファイル操作、コマンド実行、Agent Loop、製品CLIは未実装です。
+加算ツール1往復と上限付きAgent Loopも実装済みです。ファイル操作、コマンド実行、製品CLIは未実装です。
 
 ## 現在の構成
 
 ```text
 src/coding_agent/llm.py  公式SDKを直接呼ぶ学習用の実行例
 src/coding_agent/tool_use.py  addツールの1往復と最終回答の実行例
+src/coding_agent/agent_loop.py  単一addを逐次実行する上限付きループ
 tests/                   実行例とインストールのオフライン検証
 docs/learning.md         公式教材・実装を対応づける学習順序
 docs/adr/                技術選定と理由
-experiments/             今後の比較実験
+experiments/             Tool Runnerの比較など
 .github/                 CI・Issue・PRテンプレート
 pyproject.toml           パッケージ・開発依存・品質チェック設定
 ```
@@ -25,13 +26,14 @@ pyproject.toml           パッケージ・開発依存・品質チェック設�
 SDKのMessage・Usage・例外を共通型へ変換するClientやProtocolは設けません。
 `python -m coding_agent.tool_use` は加算ツールを1回実行し、結果を履歴へ追加して
 最終回答を取得します。名前・整数引数・呼び出し数・終了理由をアプリで検証します。
-詳細は [利用ガイド](llm-client.md) を参照してください。
+`python -m coding_agent.agent_loop` は毎回auto選択を使い、履歴を更新して最終回答まで反復します。
+上限・失敗停止・成功判定はアプリが管理します。詳細は [利用ガイド](llm-client.md) を参照してください。
 
 - 設定はSDKへ直接渡す。再試行もSDKへ任せる。
 - SDKの`stop_reason`を確認し、正常終了した空でない本文だけを標準出力へ表示する。
 - モデル名・終了理由・SDKの使用量を標準エラー出力へ表示する。推論本文を表示しない。
 - SDKエラー時は例外の型名だけを表示して失敗終了する。API応答本文を含む例外詳細を表示しない。
-- Haiku/Sonnetの自動振り分け・フォールバック・自動継続は行わない。
+- Haiku/Sonnetの自動振り分け・フォールバック・異常終了からの自動継続は行わない。
 
 通常テストは実際のSDKと`httpx2.MockTransport`を使い、外部通信・APIキー・API料金なしで
 実行例の設定と表示・終了の判断を検証します。SDK自体の全仕様を再検証するテストは持ちません。
@@ -54,7 +56,8 @@ SDKのMessage・Usage・例外を共通型へ変換するClientやProtocolは設
 | Client SDKのTool Runner（Beta） | 上記に加え、ツール実行・結果返却の反復と履歴 | ツールの中身、必要な制御 |
 | Claude Agent SDK | Claude Codeのループ、組み込みツール、コンテキスト管理など | アプリとの接続、設定、独自ツール・フック |
 
-現在の依存はClient SDKの`anthropic`です。Tool Runnerは未使用で、Agent SDKは未導入です。
+現在の依存はClient SDKの`anthropic`です。Tool Runnerは [オフライン比較](../experiments/tool-runner.md) 済みで、実行例は手動ループです。
+例外本文を出さず即停止する方針との差から今回の置換は行わず、Agent SDKは未導入です。
 学習用の短い手動ループからTool Runnerへ置き換える教材に沿って進め、独自の承認・
 条件付き実行などの要件があれば対応範囲を確認します。コーディング機能の組み込みが
 必要な段階ではAgent SDKも比較します。全面的な自作やSDK移行を先に固定しません。
@@ -71,7 +74,7 @@ SDKのMessage・Usage・例外を共通型へ変換するClientやProtocolは設
 ## 段階的な実装順序
 
 1. 開発環境（実装済み）と公式SDKの同期テキスト生成例（実装済み）を教材に対応づける。
-2. 公式例に沿って単一ツールの往復と短いAgent Loopを実装し、Tool Runnerと比較する。
+2. 単一ツールの往復・短いAgent Loop・Tool Runnerのオフライン比較（実装済み）を教材と照合する。
 3. ファイル調査・修正・テスト実行へ進む際、Client SDKとAgent SDKの選択と操作の境界を決める。
 4. アプリ・CLIへ統合し、オフラインE2Eと必要な実API検証を分ける。
 5. 評価セット、トレース、モデル・設定の品質・費用・時間の比較を行う。
