@@ -1,7 +1,7 @@
 """SDKを直接使う実行例の、要求設定と表示・終了の判断を検証する。"""
 
 import json
-from collections.abc import Callable, Iterator
+from collections.abc import Callable
 
 import anthropic
 import httpx2
@@ -21,32 +21,6 @@ def response_body(model: str = "claude-haiku-5-5") -> dict[str, object]:
         "stop_sequence": None,
         "usage": {"input_tokens": 10, "output_tokens": 30},
     }
-
-
-@pytest.fixture
-def mock_sdk(
-    monkeypatch: pytest.MonkeyPatch,
-) -> Iterator[Callable[[Callable[[httpx2.Request], httpx2.Response]], None]]:
-    sdk_class = anthropic.Anthropic
-    clients: list[anthropic.Anthropic] = []
-
-    def install(handler: Callable[[httpx2.Request], httpx2.Response]) -> None:
-        def create(*, timeout: float, max_retries: int) -> anthropic.Anthropic:
-            client = sdk_class(
-                api_key="test-key",
-                base_url="https://llm.test",
-                http_client=httpx2.Client(transport=httpx2.MockTransport(handler)),
-                timeout=timeout,
-                max_retries=max_retries,
-            )
-            clients.append(client)
-            return client
-
-        monkeypatch.setattr(anthropic, "Anthropic", create)
-
-    yield install
-    for client in clients:
-        assert client.is_closed()
 
 
 @pytest.mark.parametrize("model", [None, "claude-sonnet-5-5"])

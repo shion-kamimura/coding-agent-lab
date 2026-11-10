@@ -5,12 +5,13 @@
 Agent EngineeringとLLMOpsを学ぶため、公式教材を読み、公式SDKでCoding Agentを
 段階的に実装します。開発環境と、Anthropic公式Python SDKのMessages APIを直接使う
 同期テキスト生成の実行例があります。既定はHaikuで、環境変数でSonnetへ切り替えられます。
-Tool Calling、ファイル操作、コマンド実行、Agent Loop、製品CLIは未実装です。
+加算ツールの1往復も実装済みです。ファイル操作、コマンド実行、Agent Loop、製品CLIは未実装です。
 
 ## 現在の構成
 
 ```text
 src/coding_agent/llm.py  公式SDKを直接呼ぶ学習用の実行例
+src/coding_agent/tool_use.py  addツールの1往復と最終回答の実行例
 tests/                   実行例とインストールのオフライン検証
 docs/learning.md         公式教材・実装を対応づける学習順序
 docs/adr/                技術選定と理由
@@ -22,6 +23,8 @@ pyproject.toml           パッケージ・開発依存・品質チェック設�
 `python -m coding_agent.llm`は固定の質問へ1回回答する実行例です。製品CLIではありません。
 `anthropic.Anthropic`をwith文で生成・終了し、`client.messages.create()`を直接呼びます。
 SDKのMessage・Usage・例外を共通型へ変換するClientやProtocolは設けません。
+`python -m coding_agent.tool_use` は加算ツールを1回実行し、結果を履歴へ追加して
+最終回答を取得します。名前・整数引数・呼び出し数・終了理由をアプリで検証します。
 詳細は [利用ガイド](llm-client.md) を参照してください。
 
 - 設定はSDKへ直接渡す。再試行もSDKへ任せる。
