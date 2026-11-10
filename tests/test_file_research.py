@@ -114,7 +114,12 @@ def test_japanese_evidence_is_returned_without_unicode_escapes(
             return httpx2.Response(
                 200,
                 json=body(
-                    [call({"path": "README.md", "start_line": 1, "line_count": 1})],
+                    [
+                        call(
+                            {"path": "README.md", "start_line": 1, "line_count": 1},
+                            "read_file",
+                        )
+                    ],
                     "tool_use",
                 ),
             )
