@@ -6,11 +6,13 @@
 
 ## 導入・再現方法
 
+以下は当時のコミットでの手順です。#25で現行ブランチから比較用テストを削除しました。
+
 既存の`anthropic>=2.3,<3`で使え、今回の環境では追加依存のインストールは不要でした。
 公開APIは`anthropic.beta_tool`と`client.beta.messages.tool_runner()`で、Betaの入口です。
 安定版APIと同じ互換性を仮定せず、更新時は比較を再実行します。Agent SDKとは別です。
 
-[実行可能な小例](../tests/test_tool_runner_comparison.py) は、`@beta_tool`で整数2つを受けて
+[実行可能な小例](https://github.com/shion-kamimura/coding-agent-lab/blob/701fcecd415526365ed453f89fa8aae33257acee/tests/test_tool_runner_comparison.py) は、`@beta_tool`で整数2つを受けて
 文字列を返すaddを定義し、以下の設定でRunnerを反復します。
 
 ```python
