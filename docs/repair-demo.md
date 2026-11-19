@@ -50,3 +50,55 @@ LLM_MODEL=claude-sonnet-5-5 python -m coding_agent.client_repair
 [算術課題のテスト](../tests/test_repair_exercise.py)は、許可構文、固定テストの改変・リンクの拒否、
 テストプロセスの環境とタイムアウトを確認します。通常テストはAPIキー・外部通信なしで動きます。
 実モデルの課題達成や費用は模擬応答では検証できません。
+
+## 指定した練習用プロジェクトを修正する（#26）
+
+POSIX環境で、呼び出し側が用意した既存の練習用ディレクトリを
+`coding_agent.project_repair.repair_project()` に渡します。
+次の例では、`practice/` に仕様を書いた `requirements.txt`、不具合のある
+`src/price.py`、修正を検証する `tests/check.py` があることを想定しています。
+
+```python
+import sys
+from pathlib import Path
+
+from coding_agent.project_repair import repair_project
+
+print(
+    repair_project(
+        Path("practice"),
+        task="仕様とテストを読み、料金計算を修正してください。",
+        readable_files=("requirements.txt", "src/price.py", "tests/check.py"),
+        editable_file="src/price.py",
+        test_files=("tests/check.py",),
+        test_command=(sys.executable, "-I", "-B", "tests/check.py"),
+        test_timeout=5,
+    )
+)
+```
+
+- 読み取りと編集を個別に指定します。パスはルートからの相対パスです。
+  読み取りは既存のファイル調査と同じ許可リスト・パス検査を使い、1ファイルあたり
+  16 KiBまでのUTF-8を返します。編集は既存のUTF-8ファイル1つ（256 KiB以下）への
+  一意な文字列置換です。テストファイルは全て列挙し、読み取り対象に含めてください。
+  許可対象はシンボリックリンクやハードリンクを経由しない通常ファイルに限ります。
+- テストの実行ファイルは絶対パスで指定します。引数・作業場所・タイムアウトをアプリ側で
+  固定し、シェルや親プロセスの環境変数を介さずに起動します。通常終了時は終了コードと
+  標準出力・標準エラーの末尾4 KiBずつをモデルへ返します。非ゼロ終了やタイムアウトの
+  後も、モデルはAPI要求の上限内で修正と再テストを行えます。
+- 編集するたびに以前のテスト結果を破棄します。操作前、テスト終了後、完了時には、
+  未追跡ファイルも含めた作業ディレクトリの内容・種類・モードを開始時の状態と照合し、
+  アプリが行った編集だけを許容します。最終編集後の終了コードが0で、開始時から
+  編集対象に差分がある場合に、テスト結果とunified diffを返します。
+
+実行には、他のプロセスが同時に変更しない小さな使い捨ての作業ディレクトリを使います。
+テストがキャッシュなどのファイルを作る場合は、引数や設定で作成先を作業ディレクトリの
+外にするか、生成を無効にしてください。テストはモデルが編集したコードを呼び出し側の
+OS権限で実行します。隔離が必要な場合は呼び出し側で用意してください。状態の照合は
+作業ディレクトリ内の観測時点の差分を検出します。失敗時も作業中の変更は残ります。
+
+2026-11-19に確認した[公式Client SDKのツール利用例](https://github.com/anthropics/anthropic-sdk-python/blob/main/examples/tools.py)
+と同じ形式で、ツール要求と対応する結果を履歴に追加します。固定算術課題とAPIループを共有し、
+この例ではファイルの許可、テストコマンド、最終状態の照合をプロジェクト側で管理します。
+[オフラインテスト](../tests/test_project_repair.py)では、実SDKと模擬HTTP応答で複数ファイルの
+調査、失敗を受けた再修正と再テストを確認します。
