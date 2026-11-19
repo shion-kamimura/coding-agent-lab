@@ -46,11 +46,9 @@ AIが曖昧な要求から補った重要な仕様・前提が見えなくなる
   共通Client・共通型・例外変換を先回りして追加しません。必要になった場合に理由を示します。
 - ツールの中身、アプリ固有の分岐・停止・予算・権限は、その課題で必要な範囲を実装します。
   グラフのノードや分岐の設計と、SDKの入出力を独自の型へ変換することは別の判断です。
-- Agent Loopは公式例の小さな実装で仕組みを確認し、Tool Runnerへ置き換える教材を使えます。
-  自作ループの継続を前提にせず、必要な制御とTool Runnerの対応範囲を照合します。
-- コーディングエージェントの組み込み機能が必要ならClaude Agent SDKも比較します。
-  Client SDKとAgent SDKは別の製品です。新しい修正課題にAgent SDKを導入していますが、
-  既存のClient SDKによる実行例は置き換えていません。
+- Agent Loopは手動で実装し、操作の許可・履歴・反復上限・終了と成功判定をアプリで管理します。
+  複数APIの形式差は接続部分で扱い、共通化の範囲は2つ目のAPIの追加時に決めます。
+  現行方針は [ADR 0007](adr/0007-manual-client-sdk.md) にあります。
 - SDKの信頼性と、変更の影響がないことは同義ではありません。バージョン範囲、公開仕様、
   Betaの状態を確認し、プロジェクト側の動作を検証します。
 
@@ -63,11 +61,10 @@ Agent Loopなどの主要レッスン本文・コード例、SDKの関連資料�
 | 順序 | 読む公式資料 | 対応する実装・学習範囲 |
 | --- | --- | --- |
 | 1 | [Claude Platform 101](https://academy.claude.com/courses/claude-platform-101)（13レッスン・約1.5時間）の最初の3レッスン | API呼出し、応答の読み方、モデル選択。現在の [実行例](../src/coding_agent/llm.py) と照合する |
-| 2 | 同講座のThe agent loop explained・What is tool use? と [ツール利用チュートリアル](https://platform.claude.com/docs/en/agents-and-tools/tool-use/build-a-tool-using-agent) | 単一ツールの往復から小さなループへ進み、公式 [Tool Runner](https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-runner) への置換を試す |
+| 2 | 同講座のThe agent loop explained・What is tool use? と [ツール利用チュートリアル](https://platform.claude.com/docs/en/agents-and-tools/tool-use/build-a-tool-using-agent) | 単一ツールの往復から小さなループへ進み、実行・履歴・停止をアプリ側で扱う |
 | 3 | Platform 101のWhat is thinking?・Context management | 推論設定、使用量、履歴とコンテキスト管理。現在の設定値の適切さは実測で補う |
 | 4 | [Building with the Claude API](https://academy.claude.com/courses/building-with-the-claude-api)（67レッスン・約9時間）の必要な章 | 会話管理、評価、Tool Calling、ルーティング・連鎖・並列化。RAG・MCPは必要になった段階で扱う |
 | 5 | [Tool use with the Messages API](https://academy.claude.com/courses/tool-use-with-the-messages-api)（9レッスン・約1.5時間） | 基本のTool Callingが動いた後、入力の厳密化、並列実行、ストリーミング、費用改善を適用する |
-| 必要時 | [Claude Agent SDK](https://code.claude.com/docs/en/agent-sdk/overview) | ファイル操作・コマンド実行・セッション・権限などの組み込み機能を使う構成と比較する |
 
 Platform 101はPython中心ですが、最初のAPI呼出しなど一部にTypeScriptを使います。
 本リポジトリではPython SDKの現行仕様に照合して実装します。Tool use with the Messages APIは
@@ -102,13 +99,10 @@ Platform 101はPython中心ですが、最初のAPI呼出しなど一部にTypeS
 
 2026-11-10時点で、公式Client SDKを直接使う同期テキスト生成と、加算ツール1往復の
 実行例があります。#14の教材・実装の対応と検証の限界は [利用ガイド](llm-client.md#addツールを1回実行する14)
-にあります。上限付きAgent LoopとTool Runnerのオフライン比較も追加済みで、
-[ループの教材対応・責務・限界](llm-client.md#小さなagent-loop) と
-[比較結果](../experiments/tool-runner.md) を参照できます。読み取り専用File Toolsも実装済みで、[教材対応と検証の限界](file-research.md) を参照できます。
-Agent SDKによる [修正と固定テストの最小例](repair-demo.md) も追加しました。
-同じ課題のClient SDK手動ループを主軸に、失敗からの再修正・履歴・停止を学びます。
-Agent SDK版は比較用に維持し、[同一課題の比較](../experiments/repair-sdk-comparison.md) で
-委任する処理と自分で制御する処理を確認します。方針は [ADR 0006](adr/0006-client-sdk-primary.md) にあります。
+にあります。[上限付きの手動Agent Loop](llm-client.md#小さなagent-loop) と
+[読み取り専用File Tools](file-research.md) も実装済みです。
+[算術課題の修正と固定テスト](repair-demo.md) では、失敗からの再修正・履歴・停止を学びます。
+過去のSDK比較は [実験の記録](../experiments/README.md) を参照できます。
 汎用の編集・コマンド実行・製品CLIは未実装です。#6の振り返りは最初の教材を読み、
 公式SDKの要求・応答・終了理由を [実行例と利用ガイド](llm-client.md) に対応づけます。
 方針変更は [ADR 0003](adr/0003-sdk-first-learning.md)、実装順序は

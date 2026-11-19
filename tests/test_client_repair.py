@@ -112,11 +112,13 @@ def test_denied_operation_can_recover(mock_sdk: MockSDK) -> None:
     assert "固定テスト4件成功" in client.repair()
 
 
-@pytest.mark.parametrize("scenario", ["untested", "stale"])
+@pytest.mark.parametrize("scenario", ["untested", "stale", "failed"])
 def test_final_claim_requires_current_passing_tests(
     mock_sdk: MockSDK, scenario: str
 ) -> None:
     contents = [[edit("a - b", "a + b", 0)]]
+    if scenario == "failed":
+        contents = [[edit("a - b", "a * b", 0)], [call("run_tests", {}, 1)]]
     if scenario == "stale":
         contents += [[call("run_tests", {}, 1)], [edit("a + b", "a * b", 2)]]
     contents += [[{"type": "text", "text": "All tests pass."}]]
@@ -202,6 +204,9 @@ def test_tool_validation_and_test_limit(tmp_path: Path) -> None:
     for name, arguments in [
         ("Bash", {"command": "anything"}),
         ("Read", None),
+        ("Read", {"file_path": "../private"}),
+        ("Read", {"file_path": "/etc/passwd"}),
+        ("run_tests", {"command": "anything"}),
         (
             "Edit",
             {"file_path": "test_calculator.py", "old_string": "42", "new_string": "0"},

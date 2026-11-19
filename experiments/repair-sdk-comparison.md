@@ -2,6 +2,9 @@
 
 ## 目的・条件・再現方法
 
+以下は[比較時のコミット](https://github.com/shion-kamimura/coding-agent-lab/tree/0d5fc5dae153914ea11c3b172abfe2ba65a0b591)での手順です。
+#25で現行ブランチから比較スクリプトを削除しました。
+
 仮説は「課題を共有すれば、手動ループに残る制御点とSDKへ委任する部分を比較できる」。
 一般的な性能順位を決めるベンチマークではない。
 2026-11-11、Python 3.15.2、anthropic 2.3.0、claude-agent-sdk 0.2.180、
