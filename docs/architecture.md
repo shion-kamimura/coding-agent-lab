@@ -6,7 +6,8 @@ Agent EngineeringとLLMOpsを学ぶため、公式教材を読み、公式SDKで
 段階的に実装します。開発環境と、Anthropic公式Python SDKのMessages APIを直接使う
 同期テキスト生成の実行例があります。既定はHaikuで、環境変数でSonnetへ切り替えられます。
 加算ツール1往復と上限付きAgent Loop、読み取り専用のファイル調査も実装済みです。
-一時的な算術課題の修正と固定テストもClient SDKの手動ループで実行できます。
+一時的な算術課題と、呼び出し側が指定した練習用プロジェクトの修正・テストも
+Client SDKの手動ループで実行できます。
 汎用の編集・コマンド実行、製品CLIは未実装です。
 
 ## 現在の構成
@@ -17,7 +18,8 @@ src/coding_agent/tool_use.py  addツールの1往復と最終回答の実行例
 src/coding_agent/agent_loop.py  単一addを逐次実行する上限付きループ
 src/coding_agent/file_tools.py  許可ファイルの一覧・範囲読み取りと操作境界
 src/coding_agent/file_research.py  調査ループと読取履歴による引用照合
-src/coding_agent/client_repair.py  算術課題を扱うClient SDK手動ループ
+src/coding_agent/client_repair.py  共通のClient SDK手動ループと固定算術課題の実行
+src/coding_agent/project_repair.py  指定プロジェクトの編集・テスト・差分確認
 src/coding_agent/repair_exercise.py  修正ループの課題・操作境界・成功判定
 tests/                   実行例とインストールのオフライン検証
 docs/learning.md         公式教材・実装を対応づける学習順序
@@ -63,7 +65,7 @@ SDKのMessage・Usage・例外を共通型へ変換するClientやProtocolは設
 
 公式Client SDKの`anthropic`が認証・通信・APIの入出力を担当します。
 操作の許可、履歴・反復上限、テスト失敗後の再修正、停止・成功判定はアプリが管理します。
-固定課題の操作境界は [修正とテスト実行の最小例](repair-demo.md) にあります。
+固定課題と指定プロジェクトの操作境界は [修正とテスト実行の最小例](repair-demo.md) にあります。
 
 今後、別のモデルAPIを追加する際は、その公式Client SDKを使ってツール要求と結果の形式差を
 接続部分で扱います。共通化する範囲は2つ目のAPIを追加する段階で決めます。
@@ -82,7 +84,7 @@ SDKのMessage・Usage・例外を共通型へ変換するClientやProtocolは設
 
 1. 開発環境（実装済み）と公式SDKの同期テキスト生成例（実装済み）を教材に対応づける。
 2. 単一ツールの往復・上限付きの手動Agent Loop（実装済み）を教材と照合する。
-3. 読取専用調査と、Client SDKによる算術課題の修正・固定テスト（実装済み）を踏まえ、Client SDKで制御点を学び、汎用コードを扱う操作境界を決める。
+3. 読取専用調査、固定算術課題と指定練習用プロジェクトの修正・テスト（実装済み）を踏まえ、汎用コードを扱う操作境界を決める。
 4. アプリ・CLIへ統合し、オフラインE2Eと必要な実API検証を分ける。
 5. 評価セット、トレース、モデル・設定の品質・費用・時間の比較を行う。
 

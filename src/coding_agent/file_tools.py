@@ -107,14 +107,10 @@ class FileTools:
         finally:
             os.close(fd)
 
-    def read_file(
-        self, path: str, start_line: int, line_count: int
-    ) -> dict[str, object]:
+    def read_text(self, path: str, *, limit: int) -> str:
         parts(path)
         if path not in self.allowed:
             raise Rejected("Denied: file is outside the configured scope.")
-        if not 1 <= start_line <= MAX_FILE_BYTES or not 1 <= line_count <= MAX_LINES:
-            raise Rejected("Use start_line=1..262144 and line_count=1..100.")
         fd = self._open(path)
         try:
             if not stat.S_ISREG(os.fstat(fd).st_mode):
@@ -123,13 +119,23 @@ class FileTools:
             os.close(fd)
             raise
         with os.fdopen(fd, "rb") as file:
-            data = file.read(MAX_FILE_BYTES + 1)
-        if len(data) > MAX_FILE_BYTES:
-            raise Rejected("File exceeds the 262144-byte input limit.")
+            data = file.read(limit + 1)
+        if len(data) > limit:
+            raise Rejected(f"File exceeds the {limit}-byte input limit.")
         try:
-            text = data.decode("utf-8")
+            return data.decode("utf-8")
         except UnicodeDecodeError:
             raise Rejected("Only UTF-8 text is supported.") from None
+
+    def read_file(
+        self, path: str, start_line: int, line_count: int
+    ) -> dict[str, object]:
+        parts(path)
+        if path not in self.allowed:
+            raise Rejected("Denied: file is outside the configured scope.")
+        if not 1 <= start_line <= MAX_FILE_BYTES or not 1 <= line_count <= MAX_LINES:
+            raise Rejected("Use start_line=1..262144 and line_count=1..100.")
+        text = self.read_text(path, limit=MAX_FILE_BYTES)
         if any(ord(c) < 32 and c not in "\n\r\t" for c in text):
             raise Rejected("Binary/control characters are not supported.")
         lines = text.splitlines()
